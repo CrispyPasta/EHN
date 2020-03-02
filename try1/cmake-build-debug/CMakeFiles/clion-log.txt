@@ -1,11 +1,4 @@
-/home/armandt/Programs/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/armandt/Documents/EHN/try1
--- The C compiler identification is GNU 7.4.0
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Detecting C compile features
--- Detecting C compile features - done
+/home/armandt/Programs/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug LDFLAGS = -L/usr/local/ssl/lib LDLIBS = -lssl -lcrypto -G "CodeBlocks - Unix Makefiles" /home/armandt/Documents/EHN/EHN/try1
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/armandt/Documents/EHN/try1/cmake-build-debug
+-- Build files have been written to: /home/armandt/Documents/EHN/EHN/try1/cmake-build-debug
