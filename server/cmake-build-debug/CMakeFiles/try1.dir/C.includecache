@@ -6,14 +6,12 @@
 
 #IncludeRegexTransform: 
 
-/home/armandt/Documents/EHN/EHN/try1/main.c
+/home/armandt/Documents/EHN/EHN/server/main.c
 stdio.h
 -
 openssl/bio.h
 -
 openssl/ssl.h
--
-openssl/err.h
 -
 openssl/x509v3.h
 -
@@ -21,4 +19,6 @@ openssl/rand.h
 -
 stdbool.h
 -
+string.h
+/home/armandt/Documents/EHN/EHN/server/string.h
 
