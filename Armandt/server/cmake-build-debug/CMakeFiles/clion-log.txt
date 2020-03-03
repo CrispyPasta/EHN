@@ -1,0 +1,4 @@
+/home/armandt/Programs/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug LDFLAGS = -L/usr/local/ssl/lib LDLIBS = -lssl -lcrypto -G "CodeBlocks - Unix Makefiles" /home/armandt/Documents/EHN/EHN/server
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/armandt/Documents/EHN/EHN/server/cmake-build-debug

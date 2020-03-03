@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/try1.dir/main.c.o  -o try1 -lssl -lcrypto 
