@@ -43,7 +43,7 @@ void sslClient()
 
     SSL_CTX *ctx;
     SSL *ssl;
-    BIO *bio, *cbio;
+    BIO *bio;
 
     fprintf(stderr,"1");
     ctx = SSL_CTX_new(SSLv23_client_method());
@@ -52,7 +52,7 @@ void sslClient()
       return;
     }
 
-    if(!SSL_CTX_load_verify_locations(ctx, "cert.crt", NULL)){
+    if(!SSL_CTX_load_verify_locations(cstx, "cert.crt", NULL)){
 	    printf("Certificate failed");
 	    return 0;
     }
@@ -69,10 +69,10 @@ void sslClient()
 
     fprintf(stderr,"3");
 
-    cbio = BIO_new_connect("localhost:6969");
+    BIO_set_conn_hostname(bio,"localhost:6969");
 
 
-    if (BIO_do_connect(cbio) <= 0){
+    if (BIO_do_connect(bio) <= 0){
         fprintf(stderr,"fek");
         return;
     }
@@ -87,23 +87,15 @@ void sslClient()
         return ;
     }
 
-    
-        // fprintf(stderr,"4");
-        // if (BIO_do_handshake(cbio) <= 0){
-        //     printf("handshake failed\n");
-        // return;
-        // }
-        // else{
-        //     printf("handshake passed\n");
-        // }
+
 
     fprintf(stderr,"5");
 
-    readBIO(cbio);
+    readBIO(bio);
 
 fprintf(stderr,"6");
 
-    BIO_free(cbio);
+    BIO_free(bio);
 
 }
 

@@ -32,24 +32,29 @@ void sslServer()
 
     ctx = SSL_CTX_new(SSLv23_server_method());
     if (ctx == NULL){
-        printf("failed to create the SSL context\n");
+        fprintf(stderr,"failed to create the SSL context\n");
     }
 
         /*Loads and verifies the certificate and the key*/
     if(SSL_CTX_use_certificate_file(ctx,"webServCert.crt", SSL_FILETYPE_PEM) <= 0){
-	    printf("Certificate failed");
+	    fprintf(stderr,"Certificate failed");
 	    return;
     }
     
     if (SSL_CTX_use_PrivateKey_file(ctx,"webServ.key",SSL_FILETYPE_PEM) <= 0) {
-	    printf("Key failed");
+	    fprintf(stderr,"Key failed");
             return;
+    }
+
+    if (SSL_CTX_check_private_key(ctx) <= 0) {
+        fprintf(stderr,"Key ");
+        return;
     }
 
 
     bio = BIO_new_ssl(ctx,0);
     if (bio == NULL){
-        printf("failed retrieving the BIO object \n");
+        fprintf(stderr,"failed retrieving the BIO object \n");
     }
 
 
@@ -83,15 +88,15 @@ void sslServer()
         cbio = BIO_pop(abio); // retrieve BIO for connection
         
 
-        fprintf(stderr,"4");
+        // fprintf(stderr,"4");
         if (BIO_do_handshake(cbio) <= 0){
             printf("handshake failed\n");
-        return;
+            return;
         }
         else{
             printf("handshake passed\n");
         }
-        fprintf(stderr,"20");
+        // fprintf(stderr,"20");
 
         // printf(BIO_do_handshake(cbio));
 
@@ -103,9 +108,8 @@ void sslServer()
         buf[3] = '\n';
 
 
-    if (BIO_write(cbio, buf, 512)<=0){  // write to BIO connection
-        printf("FEK");
-    }
+     if (write_page(cbio,"MainPage.html") <= 0)
+        printf("fek");
 
 
     BIO_free_all(abio);
@@ -153,9 +157,11 @@ void bioServer()
         buf[3] = '\n';
 
 
-    if (BIO_write(cbio, buf, 512)<=0){  // write to BIO connection
-        printf("FEK");
-    }
+     if (write_page(cbio,"MainPage.html") <= 0)
+        printf("fek");
+    // if (BIO_write(cbio, buf, 512)<=0){  // write to BIO connection
+    //     printf("FEK");
+    // }
 
 
     BIO_free(abio);
