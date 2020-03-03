@@ -23,19 +23,19 @@ int main() {
         printf("Failed to set SSL context.\n");
     }
 
-    int added = SSL_CTX_use_certificate_file(context, "/home/armandt/Documents/EHN/EHN/server/webServ.crt", SSL_FILETYPE_PEM);
+    int added = SSL_CTX_use_certificate_file(context, "/home/armandt/Documents/EHN/EHN/server/webServCert.crt", SSL_FILETYPE_PEM);
 
     if (added != 1) {
         printf("Failed to add certificate to context.\n");
         return 0;
     }
 
-    added = SSL_CTX_use_PrivateKey_file(context, "/home/armandt/Documents/EHN/EHN/server/webServ.key", SSL_FILETYPE_PEM);
+//    added = SSL_CTX_use_PrivateKey_file(context, "/home/armandt/Documents/EHN/EHN/server/webServ.key", SSL_FILETYPE_PEM);
 
-//    if (added != 1){
-//        printf("Failed to add key to context.\n");
-//        return 0;
-//    }
+    if ((SSL_CTX_use_PrivateKey_file(context, "/home/armandt/Documents/EHN/EHN/server/webServ.key", SSL_FILETYPE_PEM)) != 1){
+        printf("Failed to add key to context.\n");
+        return 0;
+    }
 
     //make connection using BIO
     int p = 6969;
