@@ -40,19 +40,50 @@ void write_page(BIO * bio, const char * page){
 void clientHandler(BIO * connectBIO) // Handles GET requests from clients
 {
     unsigned char buf[512];
-
+  
     if (BIO_do_handshake(connectBIO) <= 0){
         fprintf(stderr,"handshake failed\n");
         return;
     }
 
-    /* TEST */
+    // /* TEST */
+
+    // BIO_read(connectBIO,buf,512);
+    // printf(buf);
+    // BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n");    
+    // write_page(connectBIO,"Website/MainPage.html");
+    // BIO_flush(connectBIO);
+    // BIO_free(connectBIO);
+
+
+    // /* END TEST */ 
 
     BIO_read(connectBIO,buf,512);
-    BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n");    
-    write_page(connectBIO,"Website/MainPage.html");
-    BIO_flush(connectBIO);
-    BIO_free(connectBIO);
+
+    if(strstr(buf,"GET") == NULL){  // Terminal Client
+        write_page(connectBIO,buf);
+        BIO_flush(connectBIO);
+    }
+    else{   // Web browser
+        char * sub = buf + 5;
+        char pageRequest[512];
+
+        for (int i = 0; i < strlen(sub)-9;i++){
+            pageRequest[i] = sub[i];
+        }
+
+        if (strlen(pageRequest) == 0){ // Send Home page
+            write_page(connectBIO,"Website/MainPage.html");
+            BIO_flush(connectBIO);
+            BIO_free(connectBIO);
+        }
+        else{   // send requested file
+            write_page(connectBIO,pageRequest);
+            BIO_flush(connectBIO);
+            BIO_free_all(connectBIO);
+        }
+
+    }
 
     return;
 }
@@ -68,6 +99,21 @@ void * threadHandler(void * connectBIO) // Handles newly created threads
 
 int main(int argc,char* argv[])
 {
+
+    /* CHAR TEST */
+        // char * bob = "GET /trev HTTP/1.1";
+        // char * sub = bob + 5;
+        // char pageRequest[512];
+
+        // for (int i = 0; i < strlen(sub)-9;i++){
+        //     pageRequest[i] = sub[i];
+        // }
+
+        // fprintf(stderr, pageRequest);
+        // fprintf(stderr, "\n\n");
+        // fprintf(stderr, "%d", strlen(pageRequest));
+        // fprintf(stderr, "\n\n");
+    /* END TEST */
 
     SSL_load_error_strings();
     SSL_library_init();
