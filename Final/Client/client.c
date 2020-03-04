@@ -1,3 +1,14 @@
+/**
+ * @file client.c
+ * @author EHN Group 16
+ * @date 4 March 2020
+ * @brief SSL Client Implementation 
+ *
+ * This implementation allows connection to an SSL server. It can show html files as well as download files of various types. It can also send custom commands 
+ * to the web server, which it will attempt to execute. The port number is  as 6969. 
+ * 
+ */
+
 #include<stdio.h>
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
