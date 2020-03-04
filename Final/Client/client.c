@@ -84,7 +84,7 @@ void sslClient()
 
     int function = -1;
 
-    while (function != 6)
+    while (function != 7)
     {
         printf("\n\n==========================================================\n");
         printf("Enter the number of your choice:\n");
@@ -93,7 +93,8 @@ void sslClient()
         printf("3: Go to Spotafly.\n");
         printf("4: Go to Prawnhub.\n");
         printf("5: Download a file.\n");
-        printf("6: Disconnect.\n");
+        printf("6: Custom request.\n");
+        printf("7: Disconnect.\n");
         printf("==========================================================\n");
         printf(">");
 
@@ -311,6 +312,17 @@ void sslClient()
 
             break;
         case 6:
+            printf("\nEnter your custom request.\n\n");
+            char request[50];
+            scanf("%s", request);
+            BIO_write(bioObject, request, 50); ///send file we want to get
+            while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+            { ///read the reply and print it out
+                printf("%s", replyBuffer);
+            }
+            printf("\n");
+            break;
+        case 7:
             printf("\nDisconnecting from server and closing client.\n\n");
             BIO_free_all(bioObject);
             SSL_CTX_free(context);
