@@ -1,6 +1,6 @@
 /**
  * @file client.c
- * @author EHN Group 16
+ * @author EHN Group 16 (WA Fourie, MB Hartman, FM van Tonder)
  * @date 4 March 2020
  * @brief SSL Client Implementation 
  *
