@@ -10,12 +10,12 @@ int main()
 
 
 
-    // bioServer();    // BIO
-    sslServer();    //   SSL
+    bioServer();    // BIO
+    // sslServer();    //   SSL
 
 
 
-return 0;
+    return 0;
 }
 
 
@@ -33,6 +33,7 @@ void sslServer()
     ctx = SSL_CTX_new(SSLv23_server_method());
     if (ctx == NULL){
         fprintf(stderr,"failed to create the SSL context\n");
+        return;
     }
 
         /*Loads and verifies the certificate and the key*/
@@ -87,8 +88,6 @@ void sslServer()
 
         cbio = BIO_pop(abio); // retrieve BIO for connection
         
-
-        // fprintf(stderr,"4");
         if (BIO_do_handshake(cbio) <= 0){
             printf("handshake failed\n");
             return;
@@ -96,9 +95,6 @@ void sslServer()
         else{
             printf("handshake passed\n");
         }
-        // fprintf(stderr,"20");
-
-        // printf(BIO_do_handshake(cbio));
 
         unsigned char buf[512];
 
@@ -107,10 +103,16 @@ void sslServer()
         buf[2] = 'B';
         buf[3] = '\n';
 
+        readBIO(cbio);
+        BIO_puts(cbio, "HTTP/1.1 200 OK\r\n\r\n\r\n");
+        
+
 
      if (write_page(cbio,"MainPage.html") <= 0)
         printf("fek");
 
+            // BIO_flush(cbio);
+        //  BIO_free_all(cbio);
 
     BIO_free_all(abio);
 
@@ -149,6 +151,8 @@ void bioServer()
 
     cbio = BIO_pop(abio); // retrieve BIO for connection
 
+
+
         unsigned char buf[512];
 
         buf[0] = 'B';
@@ -163,8 +167,13 @@ void bioServer()
     //     printf("FEK");
     // }
 
+    BIO_flush(cbio);
 
-    BIO_free(abio);
+        while(1){
+        
+    }
+
+    BIO_free_all(abio);
 
     // BIO_free(cbio);  //  Error: successive connects fail
 
@@ -173,13 +182,29 @@ printf("close\n");
 return;
 }
 
-void write_text(const char * getURL, const char * page){
+void readBIO(BIO * bio){
 
-    // system("%s > %s",getURL,page);
 
-    system(" GET url > ");
+    unsigned char buf[512];
 
+
+    if (BIO_read(bio,buf,512)>0){
+        fprintf(stderr, buf);
+    }
+    else{
+
+        buf[0] = 'f';
+        buf[1] = 'e';
+        buf[2] = 'k';
+        buf[3] = '\n';
+
+        fprintf(stderr, buf);
+    }
+
+
+    return;
 }
+
 
 
 
@@ -191,7 +216,7 @@ int write_page(BIO * bio, const char * page){
     int bytesread = 0;
     unsigned char buf[512];
 
-    f = fopen(page,"rt");
+    f = fopen(page,"r");
 
     if (!f){
         printf("could not open the page\n");
@@ -203,17 +228,22 @@ int write_page(BIO * bio, const char * page){
 
         bytesread = fread(buf,sizeof(unsigned char),512,f);
 
-        if (bytesread == 0)
+        if (bytesread == 0){
+            printf("page end");
             break;
+        }
 
-        if (BIO_write(bio, buf, 512)<=0){  // write to BIO connection
+        if (BIO_write(bio, buf, bytesread)<=0){  // write to BIO connection
             printf("Write failed \n");
             break;
         }
 
+
     }
 
     fclose(f);
+
+
 
     return 1;
 }

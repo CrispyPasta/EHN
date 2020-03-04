@@ -5,8 +5,8 @@
 int main()
 {   
 
-    // bioClient();
-    sslClient();
+    bioClient();
+    // sslClient();
 
 return 0;
 }
@@ -17,20 +17,27 @@ void readBIO(BIO * bio){
     unsigned char buf[512];
 
 
-    if (BIO_read(bio,buf,512)>0){
-        printf(buf);
-    }
-    else{
+    // if (BIO_read(bio,buf,512)>0){
+    //     printf(buf);
+    // }
+    // else{
 
-        buf[0] = 'f';
-        buf[1] = 'e';
-        buf[2] = 'k';
-        buf[3] = '\n';
+    //     buf[0] = 'f';
+    //     buf[1] = 'e';
+    //     buf[2] = 'k';
+    //     buf[3] = '\n';
 
-        printf(buf);
-    }
+    //     printf(buf);
+    // }
+            printf("read start");
 
+           while(BIO_read(bio,buf,sizeof(buf)) > 0){
+               printf("%s",buf);
+               if (BIO_eof(bio) == 1)
+                    break;
+            }
 
+            printf("read end");
     return;
 }
 
@@ -52,7 +59,7 @@ void sslClient()
       return;
     }
 
-    if(!SSL_CTX_load_verify_locations(cstx, "cert.crt", NULL)){
+    if(!SSL_CTX_load_verify_locations(ctx, "cert.crt", NULL)){
 	    printf("Certificate failed");
 	    return 0;
     }
@@ -93,8 +100,6 @@ void sslClient()
 
     readBIO(bio);
 
-fprintf(stderr,"6");
-
     BIO_free(bio);
 
 }
@@ -116,7 +121,7 @@ void bioClient()
 
     readBIO(cbio);
 
-    BIO_free(cbio);
+    BIO_free_all(cbio);
 
 
 
