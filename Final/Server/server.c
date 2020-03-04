@@ -2,7 +2,7 @@
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
 #include<pthread.h>
-#include <unistd.h>
+// #include <unistd.h>
 #include<string.h>
 
 void write_page(BIO * bio, const char * page){
@@ -11,9 +11,6 @@ void write_page(BIO * bio, const char * page){
     int bytesread = 0;
     unsigned char buf[512];
 
-    fprintf(stderr, "Page: ");
-    fprintf(stderr, page);
-    fprintf(stderr, "\n");
     f = fopen(page,"rt");
 
     if (!f){
@@ -29,20 +26,13 @@ void write_page(BIO * bio, const char * page){
             break;
         }
 
-        if (bytesread < 512){
-            buf[bytesread] = '\0';
-        }
-
-        if (BIO_write(bio, buf, bytesread)<=0){  /// write to BIO connection
+        if (BIO_write(bio, buf, bytesread)<=0){  // write to BIO connection
             fprintf(stderr,"Write failed \n");
             break;
         }
     }
 
     fclose(f);
-    // buf[0] = '\0';
-    // BIO_flush(bio);
-
 
     return;
 }
@@ -56,44 +46,39 @@ void clientHandler(BIO * connectBIO) // Handles GET requests from clients
         return;
     }
 
-    // /* TEST */
-
-    // BIO_read(connectBIO,buf,512);
-    // printf(buf);
-    // BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n");    
-    // write_page(connectBIO,"Website/MainPage.html");
-    // BIO_flush(connectBIO);
-    // BIO_free(connectBIO);
-
-
-    // /* END TEST */ 
-
     BIO_read(connectBIO,buf,512);
 
     if(strstr(buf,"GET") == NULL){  // Terminal Client
         write_page(connectBIO,buf);
         BIO_flush(connectBIO);
-        BIO_free_all(connectBIO);
     }
     else{   // Web browser
         char * sub = buf + 5;
         char pageRequest[512];
-
-        for (int i = 0; i < strlen(sub)-9;i++){
-            pageRequest[i] = sub[i];
+        int found = 0;
+        for (int i = 0; i < strlen(sub) && found == 0;i++){
+            if(sub[i] == ' '){
+                found = 1;
+            }
+            else{
+                pageRequest[i] = sub[i];
+            }
         }
+
+        BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n"); 
 
         if (strlen(pageRequest) == 0){ // Send Home page
             write_page(connectBIO,"Website/MainPage.html");
             BIO_flush(connectBIO);
+            BIO_free(connectBIO);
             BIO_free(connectBIO);
         }
         else{   // send requested file
             write_page(connectBIO,pageRequest);
             BIO_flush(connectBIO);
             BIO_free_all(connectBIO);
+            BIO_free(connectBIO);            
         }
-
     }
 
     return;
@@ -110,21 +95,6 @@ void * threadHandler(void * connectBIO) // Handles newly created threads
 
 int main(int argc,char* argv[])
 {
-
-    /* CHAR TEST */
-        // char * bob = "GET /trev HTTP/1.1";
-        // char * sub = bob + 5;
-        // char pageRequest[512];
-
-        // for (int i = 0; i < strlen(sub)-9;i++){
-        //     pageRequest[i] = sub[i];
-        // }
-
-        // fprintf(stderr, pageRequest);
-        // fprintf(stderr, "\n\n");
-        // fprintf(stderr, "%d", strlen(pageRequest));
-        // fprintf(stderr, "\n\n");
-    /* END TEST */
 
     SSL_load_error_strings();
     SSL_library_init();
@@ -174,7 +144,7 @@ int main(int argc,char* argv[])
         return 0;
     }
   
-    BIO_set_nbio_accept(acceptBIO,1); // set to non-blocking mode(1) 
+    BIO_set_nbio_accept(acceptBIO,0); // set to blocking mode 
 
     for (;;){   // indefinitely accepts connecting bios
 
@@ -190,7 +160,7 @@ int main(int argc,char* argv[])
                 fprintf(stderr, "Error creating the thread\n"); // Error creating the thread
             }
 
-            usleep(1000);
+            // usleep(1000);
         }
 
     }
