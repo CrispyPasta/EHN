@@ -51,6 +51,7 @@ void clientHandler(BIO * connectBIO) // Handles GET requests from clients
     if(strstr(buf,"GET") == NULL){  // Terminal Client
         write_page(connectBIO,buf);
         BIO_flush(connectBIO);
+	BIO_free_all(connectBIO); 
     }
     else{   // Web browser
         char * sub = buf + 5;
@@ -68,16 +69,16 @@ void clientHandler(BIO * connectBIO) // Handles GET requests from clients
         BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n"); 
 
         if (strlen(pageRequest) == 0){ // Send Home page
-            write_page(connectBIO,"Website/MainPage.html");
+            write_page(connectBIO,"Website/Default_Page.html");
             BIO_flush(connectBIO);
             BIO_free(connectBIO);
-            BIO_free(connectBIO);
+
         }
         else{   // send requested file
             write_page(connectBIO,pageRequest);
             BIO_flush(connectBIO);
             BIO_free_all(connectBIO);
-            BIO_free(connectBIO);            
+           
         }
     }
 
