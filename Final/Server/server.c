@@ -1,11 +1,25 @@
+/**
+ * @file server.c
+ * @author EHN Group 16 (WA Fourie, MB Hartman, FM van Tonder)
+ * @date 4 March 2020
+ * @brief SSL web server implementation
+ * This implementation creates an SSL server that takes requests from clients and returns local html pages and other files.
+ */
+
 #include<stdio.h>
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
 #include<pthread.h>
-// #include <unistd.h>
+#include<unistd.h>
 #include<string.h>
 
-void write_page(BIO * bio, const char * page){
+/**
+ * @brief A function that writes the contents of a file to the bio buffer.
+ * @param bio A bio object whose buffer will be read to.
+ * @param page The location of the file to read from.
+ */
+void write_page(BIO * bio, const char * page)
+{
 
     FILE * f;
     int bytesread = 0;
@@ -37,6 +51,11 @@ void write_page(BIO * bio, const char * page){
     return;
 }
 
+/**
+ * @brief Handles requests of connected clients.
+ * Determines whether a client is terminal or web browser based. Sends the corresponding request to the client.
+ * @param connectBIO The BIO object for the connected client.
+ */
 void clientHandler(BIO * connectBIO) // Handles GET requests from clients
 {
     unsigned char buf[512];
@@ -46,38 +65,38 @@ void clientHandler(BIO * connectBIO) // Handles GET requests from clients
         return;
     }
 
-    BIO_read(connectBIO,buf,512);
+    BIO_read(connectBIO,buf,512);   // Read message from the client
 
     if(strstr(buf,"GET") == NULL){  // Terminal Client
-        write_page(connectBIO,buf);
-        BIO_flush(connectBIO);
-	BIO_free_all(connectBIO); 
+        write_page(connectBIO,buf); // Write page to client
+        BIO_flush(connectBIO);     // Send buffer EOF
+	    BIO_free_all(connectBIO);   // Close connect socket
     }
-    else{   // Web browser
-        char * sub = buf + 5;
-        char pageRequest[512];
-        int found = 0;
-        for (int i = 0; i < strlen(sub) && found == 0;i++){
+    else{   // Web browser client
+        char * sub = buf + 5;   // remove "GET /" from the buffer string
+        char pageRequest[512];  // request to handle
+        int found = 0;  //  the space at the end of the request has not been found
+        for (int i = 0; i < strlen(sub) && found == 0;i++){ // copy sub into pageRequest up to the first space.
             if(sub[i] == ' '){
-                found = 1;
+                found = 1;  //  Space was found -> end loop.
             }
             else{
-                pageRequest[i] = sub[i];
+                pageRequest[i] = sub[i]; // copy sub character into pageRequest
             }
         }
 
-        BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n"); 
+        BIO_puts(connectBIO, "HTTP/1.1 200 OK\r\n\r\n\r\n"); //  Send OK to web browser
 
-        if (strlen(pageRequest) == 0){ // Send Home page
-            write_page(connectBIO,"Website/Default_Page.html");
-            BIO_flush(connectBIO);
-            BIO_free(connectBIO);
+        if (strlen(pageRequest) == 0){ // Send default page
+            write_page(connectBIO,"Website/Default_Page.html"); //  write default page to buffer
+            BIO_flush(connectBIO);  // send buffer EOF
+            BIO_free(connectBIO);   //  close connect socket
 
         }
         else{   // send requested file
-            write_page(connectBIO,pageRequest);
-            BIO_flush(connectBIO);
-            BIO_free_all(connectBIO);
+            write_page(connectBIO,pageRequest); // write requested file or page to the buffer
+            BIO_flush(connectBIO);  // send buffer EOF
+            BIO_free_all(connectBIO); // close connect socket
            
         }
     }
@@ -85,6 +104,10 @@ void clientHandler(BIO * connectBIO) // Handles GET requests from clients
     return;
 }
 
+/**
+ * @brief A function that handles newly connected threads and calls the clientHandler with the connected thread bio.
+ * @param connectBIO A newly connected BIO.
+ */
 void * threadHandler(void * connectBIO) // Handles newly created threads
 {
 
@@ -94,11 +117,17 @@ void * threadHandler(void * connectBIO) // Handles newly created threads
 
 }
 
+/**
+ * @brief The main function that does initial server startup.
+ * Sets up the server on port 6969. Loads the certificate and private keys. Waits for clients to connect. Makes new threads for connected clients
+ * @param argv[1] Stores the location of the web certificate.
+ * @param argv[2] Stores the location of the web private key.
+ */
 int main(int argc,char* argv[])
 {
 
-    SSL_load_error_strings();
-    SSL_library_init();
+    SSL_load_error_strings(); 
+    SSL_library_init(); // initialise ssl library
 
     SSL_CTX * context;
     SSL * ssl;
@@ -161,7 +190,7 @@ int main(int argc,char* argv[])
                 fprintf(stderr, "Error creating the thread\n"); // Error creating the thread
             }
 
-            // usleep(1000);
+            usleep(420); 
         }
 
     }
