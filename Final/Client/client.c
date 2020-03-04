@@ -7,10 +7,7 @@ char* certificateFileName;
 
 int main(int argc, char* argv[])
 {
-    // bioClient();
     certificateFileName = argv[1];
-
-
     sslClient();
 
 return 0;
@@ -35,34 +32,34 @@ void sslClient()
     char replyBuffer[512];      ///this holds the data sent from the webserver
 
     fprintf(stderr,"1");
-    context = SSL_CTX_new(SSLv23_client_method());
+    context = SSL_CTX_new(SSLv23_client_method());  ///establish SSL context object
     if (context == NULL) {
-      printf("failed to create the SSL context\n");
+      printf("Could not create SSL context\n");
       return;
     }
 
-    if(!SSL_CTX_load_verify_locations(context, certificateFileName, NULL)){
-	    printf("Certificate failed");
+    if(!SSL_CTX_load_verify_locations(context, certificateFileName, NULL)){     ///load the CA's certificate
+	    printf("Failed to load CA certificates");
 	    return 0;
     }
 
     fprintf(stderr,"2");
 
-    bioObject = BIO_new_ssl_connect(context);
+    bioObject = BIO_new_ssl_connect(context);   ///make new connection object
     if (bioObject == NULL){
-        printf("failed retrieving the BIO object \n");
+        printf("Could not retieve BIO object \n");
     }
 
     BIO_get_ssl(bioObject,&sslObject);
-    SSL_set_mode(sslObject, SSL_MODE_AUTO_RETRY);
+    SSL_set_mode(sslObject, SSL_MODE_AUTO_RETRY);   
 
     fprintf(stderr,"3");
 
-    BIO_set_conn_hostname(bioObject,"localhost:6969");
+    BIO_set_conn_hostname(bioObject,"localhost:6969");  ///set connection details using port number
 
 
-    if (BIO_do_connect(bioObject) <= 0){
-        fprintf(stderr,"fek\n");
+    if (BIO_do_connect(bioObject) <= 0){    ///make the connection to the server
+        fprintf(stderr,"Oh no\n");
         return;
     }
 
@@ -70,7 +67,7 @@ void sslClient()
     fprintf(stderr,"4");
 
 
-    if(SSL_get_verify_result(sslObject) != X509_V_OK)
+    if(SSL_get_verify_result(sslObject) != X509_V_OK)   ///verify the certificate 
     {
         fprintf(stderr, "Certificate verification error: %li\n", SSL_get_verify_result(sslObject));
         return ;
@@ -82,7 +79,7 @@ void sslClient()
 
     fprintf(stderr, "Connection established.\n");
 
-    int function = -1;
+    int function = -1;  ///use to break out of loop
 
     while (function != 7)
     {
@@ -98,7 +95,7 @@ void sslClient()
         printf("==========================================================\n");
         printf(">");
 
-        scanf("%d", &function); //get the response from the user
+        scanf("%d", &function); ///get the response from the user
 
         switch (function)
         {
@@ -171,11 +168,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("ted.pdf", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -189,11 +186,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("ratatoullie_script.pdf", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -206,11 +203,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("21_Jump_Street.pdf", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -223,11 +220,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("crabRave.mp3", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -240,11 +237,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("flySound.mp3", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -257,12 +254,12 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("noice.mp3", "w");
 
                 int b = 10;
-                while (b > 0)
+                while (b > 0)   ///download the file parts
                 {
                     b = BIO_read(bioObject, replyBuffer, sizeof(replyBuffer));
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
@@ -276,11 +273,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("PrawnHub.png", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -293,11 +290,11 @@ void sslClient()
                 printf(filename);
                 printf("\n");
                 
-                BIO_write(bioObject, filename, 512);
+                BIO_write(bioObject, filename, 512);    ///send the file request to the server
 
                 fileDownload = fopen("PrawnsInParadise.jpg", "w");
 
-                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
+                while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)   ///download the file parts
                 {
                     fwrite(replyBuffer, sizeof(unsigned char), sizeof(replyBuffer), fileDownload);
                 }
@@ -311,21 +308,21 @@ void sslClient()
 
 
             break;
-        case 6:
+        case 6: ///this will show weird data if you try to DOWNLOAD a file
             printf("\nEnter your custom request.\n\n");
             char request[50];
-            scanf("%s", request);
-            BIO_write(bioObject, request, 50); ///send file we want to get
+            scanf("%s", request);   ///read the entered text
+            BIO_write(bioObject, request, 50); ///send request to the server
             while (BIO_read(bioObject, replyBuffer, sizeof(replyBuffer)) > 0)
             { ///read the reply and print it out
-                printf("%s", replyBuffer);
+                printf("%s", replyBuffer);  
             }
             printf("\n");
             break;
         case 7:
             printf("\nDisconnecting from server and closing client.\n\n");
-            BIO_free_all(bioObject);
-            SSL_CTX_free(context);
+            BIO_free_all(bioObject);    ///free all BIO chains
+            SSL_CTX_free(context);      ///free the SSL context
             return;
             break;
         default:
@@ -334,9 +331,8 @@ void sslClient()
         }
 
         // printf("Finished with the switch statement.\n");
-        /// Reconnect after the successful transaction
 
-        BIO_free_all(bioObject);
+        BIO_free_all(bioObject); /// Reconnect after the successful transaction
         BIO_reset(bioObject);
         // if (BIO_free(bioObject) == 1)
         // {
@@ -347,7 +343,7 @@ void sslClient()
 
         bioObject = NULL;
 
-        bioObject = BIO_new_ssl_connect(context);
+        bioObject = BIO_new_ssl_connect(context);   ///establish new bio object
 
         // printf("Made new bio object using existing context.\n");
         if (bioObject == NULL)
@@ -356,14 +352,13 @@ void sslClient()
             return;
         }
 
-        ///disable retries like in the practical guide
-        BIO_get_ssl(bioObject, &sslObject);
+        BIO_get_ssl(bioObject, &sslObject);  ///disable retries like in the practical guide
         SSL_set_mode(sslObject, SSL_MODE_AUTO_RETRY);
 
-        BIO_set_conn_hostname(bioObject, "localhost:6969");
+        BIO_set_conn_hostname(bioObject, "localhost:6969");     ///set the bio connection details again
         // printf("Make connection to localhost:6969\n");
 
-        if (BIO_do_connect(bioObject) != 1)
+        if (BIO_do_connect(bioObject) != 1) ///connect again
         {
             printf("Reconnection failed.\n");
             BIO_free_all(bioObject);
@@ -371,7 +366,7 @@ void sslClient()
             return;
         }
 
-        if (SSL_get_verify_result(sslObject) != X509_V_OK)
+        if (SSL_get_verify_result(sslObject) != X509_V_OK)  ///check the verification again
         {
             fprintf(stderr, "Error verifying certificate.\n");
             BIO_free_all(bioObject);
